@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+    <link rel="stylesheet" href="./lib/boot-strap.css">
+</head>
+<body>
+    
+    <div id="app">
+
+            <div class="panel panel-primary">
+                    <div class="panel-heading">
+                          <h3 class="panel-title">添加品牌</h3>
+                    </div>
+                    <div class="panel-body form-inline">
+                          <label>
+                              ID:
+                              <input type="text" class="form-control" v-model="id">
+                          </label>    
+                          <label>
+                              Name:
+                              <input type="text" class="form-control" v-model="name">
+                          </label> 
+                          
+                          <input type="button" value="添加" calss="btn btn-primary" @click="add">
+
+                          <label>
+                                搜索名称关键字:
+                                <input type="text" class="form-control" v-model="keyWorlds">
+                            </label> 
+                    </div>
+              </div>
+              
+              
+              <table class="table table-hover table-bordered table-striped">
+                  <thead>
+                      <tr>
+                          <th>ID</th>
+                          <th>Name</th>
+                          <th>Ctime</th>
+                          <th>Operation</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                        <!--之前，v-for中的数据都是直接从data上的list中直接渲染过来的-->
+                        <!--现在我们自定义了一个search方法，同时把所有关键字，通过传参的形式传递给了search方法-->
+                        <!--在search方法内部，通过执行for循环，把所有符合搜索关键词的数据保存到一个新的数组中，返回-->
+                        <tr v-for="item in search(keyWorlds)" :key="item.id">
+                            <td>{{item.id}}</td>
+                            <td v-text="item.name"></td>
+                            <td>{{item.ctime  | filterData}}</td>
+                            <td>
+                                <a href="" @click.prevent="del(item.id)">删除</a>
+                            </td>
+                        </tr>
+                    </tbody>
+              </table>
+        
+    </div>
+
+    
+    <script>
+
+        //全居过滤器语法
+        // Vue.filter('filterData',function(data ){
+
+        //        var dt = new Date(data);
+
+        //        var y = dt.getFullYear();
+        //        var m = dt.getMonth() + 1;
+        //        var d = dt.getDate();
+        //        var h = dt.getHours();
+        //        var mm = dt.getMinutes();
+        //        var s = dt.getSeconds();
+
+        //        return `${y}-${m}-${d}  ${h}:${mm}:${s}`;     
+        
+        // })
+
+        var vm = new Vue({
+            el: '#app',
+            data :{
+                   id : '',
+                   name : '',
+                   keyWorlds :'',
+                   list:[
+                       {id: 1, name:'宝马', ctime:new Date() },
+                       {id: 2, name:'奔驰', ctime:new Date() },
+                   ]
+            },
+            methods:{
+                add(){
+                   var obj ={
+                       id:this.id,
+                       name:this.name,
+                       ctime:new Date()
+                   } ;
+                   this.list.push(obj);
+
+                   this.id = '';
+                   this.name = '';
+                },
+                del(id){
+                    
+                    // //根据id删除数据
+                    // this.list.some((itme,i)=>{
+                          
+                    //       if(itme.id == id){
+
+                    //           this.list.splice(i,1);
+
+                    //           return true;
+
+                    //       }
+                    // })
+                    //查找suoyin 
+                    var index = this.list.findIndex(itme => {
+                              
+                        if (itme.id == id) {
+                            return true;
+                        }
+                    })
+                    
+                    this.list.splice(index,1);
+
+                },
+                search(keyWorlds){//根据关键字寻找数据
+                   
+                //    var newList = [];
+
+                //    this.list.forEach(item=>{
+                //             if(item.name.indexOf(keyWorlds) != -1){
+                //                 newList.push(item)
+                //             }
+                //         })
+                //         return newList
+
+               return this.list.filter(itme => {
+
+                   // 是否包含某元素 包含为true 不包含为false
+                    if(itme.name.includes(keyWorlds)){
+
+                        return true;
+
+                    }
+
+                });
+
+                }
+            
+            },
+            //定义私有过滤器
+            //过滤器采用就近原则 优先采用私有过滤器
+            filters : {
+
+                filterData:function(data){
+
+                    var dt = new Date(data);
+
+                    var y = dt.getFullYear();
+                    var m = dt.getMonth() + 1;
+                    //字符填充 esc6语法
+                    m = m.toString().padStart(2 , '0');
+                    var d = dt.getDate();
+                    d = d.toString().padStart(2 , '0');
+                    var h = dt.getHours();
+                    h = h.toString().padStart(2 , '0');
+                    var mm = dt.getMinutes();
+                    mm = mm.toString().padStart(2 , '0');
+                    var s = dt.getSeconds();
+                    s = s.toString().padStart(2 , '0');
+
+                    return `${y}-${m}-${d}  ${h}:${mm}:${s}`;   
+
+                }
+            }
+
+        });
+
+      
+    </script>
+</body>
+</html>
